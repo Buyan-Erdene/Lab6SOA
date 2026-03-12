@@ -24,5 +24,3 @@ frontend-app/index.html файлыг browser-т шууд нээнэ.
 JSON Service нь authentication шууд хийхгүй — SOAP ValidateToken руу middleware-ээр дамжуулна. Энэ нь Single Responsibility Principle-ийг баримтална.
 2. Token стратеги :
 UUID-д суурилсан энгийн token ашигласан. Login хийх бүрт шинэ token үүсч, DB-д хадгалагдана. 
-3. CORS тохиргоо :
-Frontend өөр origin-аас хандах тул @CrossOrigin(origins = "*") нэмсэн. Production-д тодорхой origin заах хэрэгтэй.
