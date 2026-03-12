@@ -13,7 +13,7 @@ public class UserProfile {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username;  // SOAP-ын username-тэй холбоно
+    private String username;
 
     private String name;
     private String email;

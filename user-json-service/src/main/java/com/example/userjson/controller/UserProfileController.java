@@ -18,7 +18,6 @@ public class UserProfileController {
     private final UserProfileRepository repo;
     private final SoapAuthClient soapAuthClient;
 
-    // ── Token шалгах туслах метод ──────────────────────────────
     private ResponseEntity<?> checkAuth(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -29,10 +28,9 @@ public class UserProfileController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                  .body("Token хүчингүй");
         }
-        return null;  // null = зөв, үргэлжлүүлэх
+        return null;
     }
 
-    // ── GET /users  (бүх профайл) ─────────────────────────────
     @GetMapping
     public ResponseEntity<?> getAll(
             @RequestHeader(value = "Authorization", required = false) String auth) {
@@ -43,7 +41,6 @@ public class UserProfileController {
         return ResponseEntity.ok(repo.findAll());
     }
 
-    // ── GET /users/{id} ───────────────────────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
             @PathVariable Long id,
@@ -57,7 +54,6 @@ public class UserProfileController {
                    .orElse(ResponseEntity.notFound().build());
     }
 
-    // ── POST /users  (шинэ профайл үүсгэх) ───────────────────
     @PostMapping
     public ResponseEntity<?> create(
             @RequestBody UserProfile profile,
@@ -70,7 +66,6 @@ public class UserProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // ── PUT /users/{id}  (шинэчлэх) ──────────────────────────
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
@@ -89,7 +84,6 @@ public class UserProfileController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ── DELETE /users/{id} ────────────────────────────────────
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
             @PathVariable Long id,

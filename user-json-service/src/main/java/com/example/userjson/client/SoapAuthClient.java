@@ -10,7 +10,6 @@ public class SoapAuthClient extends WebServiceGatewaySupport {
     private static final String NAMESPACE = "http://example.com/users";
 
     public boolean validateToken(String token) {
-        // SOAP XML envelope-г гараар бүтээх
         String soapBody = String.format("""
             <soapenv:Envelope
                 xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -30,7 +29,7 @@ public class SoapAuthClient extends WebServiceGatewaySupport {
                         msg -> {
                             try {
                                 msg.getPayloadResult()
-                                   .getClass(); // just trigger
+                                   .getClass();
                                 javax.xml.transform.stream.StreamSource source =
                                     new javax.xml.transform.stream.StreamSource(
                                         new java.io.StringReader(soapBody));
@@ -45,7 +44,6 @@ public class SoapAuthClient extends WebServiceGatewaySupport {
                         msg -> msg
                     );
 
-            // Response-г string болгоно
             java.io.StringWriter sw = new java.io.StringWriter();
             javax.xml.transform.TransformerFactory
                 .newInstance()

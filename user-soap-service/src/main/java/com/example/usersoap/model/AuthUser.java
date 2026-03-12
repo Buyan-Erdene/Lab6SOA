@@ -20,10 +20,10 @@ public class AuthUser {
     private String username;
 
     @Column(nullable = false)
-    private String password;  // энгийн текст (production-д hash хэрэглэнэ)
+    private String password; 
 
     @Column(unique = true)
     private String email;
 
-    private String token;  // login-д үүсгэсэн token
+    private String token;
 }

@@ -23,7 +23,6 @@ public class UserAuthEndpoint {
     private static final String NAMESPACE = "http://example.com/users";
     private final AuthUserRepository repo;
 
-    // ── Register ──────────────────────────────────────────────
     @PayloadRoot(namespace = NAMESPACE, localPart = "RegisterUserRequest")
     @ResponsePayload
     public RegisterUserResponse register(@RequestPayload RegisterUserRequest req) {
@@ -46,7 +45,6 @@ public class UserAuthEndpoint {
         return res;
     }
 
-    // ── Login ─────────────────────────────────────────────────
     @PayloadRoot(namespace = NAMESPACE, localPart = "LoginUserRequest")
     @ResponsePayload
     public LoginUserResponse login(@RequestPayload LoginUserRequest req) {
@@ -71,7 +69,6 @@ public class UserAuthEndpoint {
         return res;
     }
 
-    // ── ValidateToken ─────────────────────────────────────────
     @PayloadRoot(namespace = NAMESPACE, localPart = "ValidateTokenRequest")
     @ResponsePayload
     public ValidateTokenResponse validateToken(@RequestPayload ValidateTokenRequest req) {
