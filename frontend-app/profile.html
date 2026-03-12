@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>Профайл</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    .container { max-width: 500px; margin: 40px auto; background: white;
+                 padding: 32px; border-radius: 12px; box-shadow: 0 2px 12px #0001; }
+    h2 { margin-bottom: 20px; color: #333; }
+    label { font-size: 13px; color: #666; display: block; margin-bottom: 4px; }
+    input, textarea {
+      width: 100%; padding: 10px; margin-bottom: 16px;
+      border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .btn-row { display: flex; gap: 8px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 6px;
+             font-size: 14px; cursor: pointer; }
+    .save { background: #5547b8; color: white; }
+    .save:hover { background: #3f358a; }
+    .logout { background: #eee; color: #333; }
+    .logout:hover { background: #ddd; }
+    #msg { margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 13px; display: none; }
+    .success { background: #e8f5e9; color: #2e7d32; }
+    .error   { background: #ffebee; color: #c62828; }
+    .header  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .username-badge { background: #ede9ff; color: #5547b8;
+                      padding: 4px 10px; border-radius: 20px; font-size: 13px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2>Миний профайл</h2>
+    <span class="username-badge" id="uname-badge"></span>
+  </div>
+
+  <label>Нэр</label>
+  <input id="p-name"  placeholder="Таны нэр">
+  <label>И-мэйл</label>
+  <input id="p-email" placeholder="email@example.com">
+  <label>Утас</label>
+  <input id="p-phone" placeholder="+976 ...">
+  <label>Bio</label>
+  <textarea id="p-bio" rows="3" placeholder="Өөрийнхөө тухай..."></textarea>
+
+  <div class="btn-row">
+    <button class="save"   onclick="saveProfile()">Хадгалах</button>
+    <button class="logout" onclick="logout()">Гарах</button>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<script>
+  const JSON_URL = 'http://localhost:8082/users';
+  const token    = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
+  let   profileId = null;
+
+  if (!token) window.location.href = 'index.html';
+
+  document.getElementById('uname-badge').textContent = username || '';
+
+  function showMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent   = text;
+    el.className     = type;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + token
+  };
+
+  async function loadProfile() {
+    try {
+      const res  = await fetch(JSON_URL, { headers });
+      if (res.status === 401) { logout(); return; }
+      const list = await res.json();
+      const me   = list.find(u => u.username === username);
+      if (me) {
+        profileId = me.id;
+        document.getElementById('p-name').value  = me.name  || '';
+        document.getElementById('p-email').value = me.email || '';
+        document.getElementById('p-phone').value = me.phone || '';
+        document.getElementById('p-bio').value   = me.bio   || '';
+      }
+    } catch(e) { showMsg('Профайл ачаалахад алдаа гарлаа', 'error'); }
+  }
+
+  async function saveProfile() {
+    const body = {
+      username,
+      name:  document.getElementById('p-name').value,
+      email: document.getElementById('p-email').value,
+      phone: document.getElementById('p-phone').value,
+      bio:   document.getElementById('p-bio').value
+    };
+
+    try {
+      let res;
+      if (profileId) {
+        res = await fetch(`${JSON_URL}/${profileId}`,
+          { method: 'PUT', headers, body: JSON.stringify(body) });
+      } else {
+        res = await fetch(JSON_URL,
+          { method: 'POST', headers, body: JSON.stringify(body) });
+        if (res.ok) { const d = await res.json(); profileId = d.id; }
+      }
+      showMsg(res.ok ? 'Амжилттай хадгалагдлаа!' : 'Алдаа гарлаа',
+              res.ok ? 'success' : 'error');
+    } catch(e) { showMsg('Холболтын алдаа', 'error'); }
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    window.location.href = 'index.html';
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>
