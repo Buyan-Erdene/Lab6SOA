@@ -56,8 +56,10 @@
   function showTab(tab) {
     document.getElementById('login-form').style.display    = tab==='login'    ? '' : 'none';
     document.getElementById('register-form').style.display = tab==='register' ? '' : 'none';
-    document.querySelectorAll('.tab').forEach((t,i) =>
-      t.classList.toggle('active', (i===0) === (tab==='login')));
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('active', (i===0) === (tab==='login'));
+    }
   }
 
   function showMsg(text, type) {
@@ -67,18 +69,28 @@
     el.style.display = 'block';
   }
 
-  async function soapCall(body) {
-    const env = `<soapenv:Envelope
-      xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:usr="${NS}">
-      <soapenv:Body>${body}</soapenv:Body>
-    </soapenv:Envelope>`;
-    const res = await fetch(SOAP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/xml', 'SOAPAction': '' },
-      body: env
+  function soapCall(body) {
+    var env = '<soapenv:Envelope' +
+      ' xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"' +
+      ' xmlns:usr="' + NS + '">' +
+      ' <soapenv:Body>' + body + '</soapenv:Body>' +
+      '</soapenv:Envelope>';
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', SOAP_URL, true);
+      xhr.setRequestHeader('Content-Type', 'text/xml');
+      xhr.setRequestHeader('SOAPAction', '');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(xhr.responseText);
+          } else {
+            reject(new Error('Request failed'));
+          }
+        }
+      };
+      xhr.send(env);
     });
-    return await res.text();
   }
 
   function getTag(xml, tag) {
@@ -92,7 +104,7 @@
     if (!u || !p) return showMsg('Талбаруудыг бөглөнө үү', 'error');
 
     const xml = await soapCall(
-      `<usr:LoginUserRequest><usr:username>${u}</usr:username><usr:password>${p}</usr:password></usr:LoginUserRequest>`
+      '<usr:LoginUserRequest><usr:username>' + u + '</usr:username><usr:password>' + p + '</usr:password></usr:LoginUserRequest>'
     );
     const success = getTag(xml, 'success') === 'true';
     const token   = getTag(xml, 'token');
@@ -113,11 +125,11 @@
     if (!u || !p || !e) return showMsg('Бүх талбарыг бөглөнө үү', 'error');
 
     const xml = await soapCall(
-      `<usr:RegisterUserRequest>
-         <usr:username>${u}</usr:username>
-         <usr:password>${p}</usr:password>
-         <usr:email>${e}</usr:email>
-       </usr:RegisterUserRequest>`
+      '<usr:RegisterUserRequest>' +
+         '<usr:username>' + u + '</usr:username>' +
+         '<usr:password>' + p + '</usr:password>' +
+         '<usr:email>' + e + '</usr:email>' +
+       '</usr:RegisterUserRequest>'
     );
     const success = getTag(xml, 'success') === 'true';
     const msg     = getTag(xml, 'message');

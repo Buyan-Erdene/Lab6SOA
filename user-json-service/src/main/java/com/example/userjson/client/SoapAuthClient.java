@@ -1,56 +1,25 @@
 package com.example.userjson.client;
 
+import com.example.users.ValidateTokenRequest;
+import com.example.users.ValidateTokenResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.client.core.WebServiceTemplate;
 
 @Service
-public class SoapAuthClient extends WebServiceGatewaySupport {
+@RequiredArgsConstructor
+public class SoapAuthClient {
 
-    private static final String SOAP_URI = "http://localhost:8081/ws";
-    private static final String NAMESPACE = "http://example.com/users";
+    private final WebServiceTemplate webServiceTemplate;
 
     public boolean validateToken(String token) {
-        String soapBody = String.format("""
-            <soapenv:Envelope
-                xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                xmlns:usr="%s">
-               <soapenv:Body>
-                  <usr:ValidateTokenRequest>
-                     <usr:token>%s</usr:token>
-                  </usr:ValidateTokenRequest>
-               </soapenv:Body>
-            </soapenv:Envelope>
-            """, NAMESPACE, token);
+        ValidateTokenRequest request = new ValidateTokenRequest();
+        request.setToken(token);
 
         try {
-            org.springframework.ws.WebServiceMessage response =
-                getWebServiceTemplate()
-                    .sendAndReceive(SOAP_URI,
-                        msg -> {
-                            try {
-                                msg.getPayloadResult()
-                                   .getClass();
-                                javax.xml.transform.stream.StreamSource source =
-                                    new javax.xml.transform.stream.StreamSource(
-                                        new java.io.StringReader(soapBody));
-                                javax.xml.transform.TransformerFactory
-                                    .newInstance()
-                                    .newTransformer()
-                                    .transform(source, msg.getPayloadResult());
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        msg -> msg
-                    );
-
-            java.io.StringWriter sw = new java.io.StringWriter();
-            javax.xml.transform.TransformerFactory
-                .newInstance()
-                .newTransformer()
-                .transform(response.getPayloadSource(),
-                           new javax.xml.transform.stream.StreamResult(sw));
-            return sw.toString().contains("<valid>true</valid>");
+            ValidateTokenResponse response = (ValidateTokenResponse) webServiceTemplate
+                .marshalSendAndReceive("http://localhost:8081/ws", request);
+            return response.isValid();
         } catch (Exception e) {
             return false;
         }
