@@ -1,28 +1,27 @@
 package com.example.usersoap.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-@Entity
-@Table(name = "auth_users")
+@Document(collection = "auth_users")   // @Entity → @Document
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;                 // Long → String
 
-    @Column(unique = true, nullable = false)
+    @Indexed(unique = true)
     private String username;
 
-    @Column(nullable = false)
-    private String password; 
+    private String password;
 
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String email;
 
     private String token;
