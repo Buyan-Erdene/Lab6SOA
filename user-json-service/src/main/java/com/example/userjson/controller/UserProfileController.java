@@ -43,7 +43,7 @@ public class UserProfileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestHeader(value = "Authorization", required = false) String auth) {
 
         ResponseEntity<?> authCheck = checkAuth(auth);
@@ -68,7 +68,7 @@ public class UserProfileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody UserProfile updated,
             @RequestHeader(value = "Authorization", required = false) String auth) {
 
@@ -86,7 +86,7 @@ public class UserProfileController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestHeader(value = "Authorization", required = false) String auth) {
 
         ResponseEntity<?> authCheck = checkAuth(auth);

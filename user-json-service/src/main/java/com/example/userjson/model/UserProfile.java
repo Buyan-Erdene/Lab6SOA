@@ -1,22 +1,23 @@
 package com.example.userjson.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-@Entity
-@Table(name = "user_profiles")
+@Document(collection = "user_profiles")  // @Entity → @Document
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;  // Long → String (MongoDB ObjectId)
 
-    @Column(unique = true, nullable = false)
+    @Indexed(unique = true)
     private String username;
 
     private String name;
     private String email;
     private String bio;
     private String phone;
+    private String profileImageUrl; // Spaces-ийн зураг URL (Lab07)
 }
